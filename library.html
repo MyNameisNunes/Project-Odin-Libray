@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0d;
+      --bg2: #141414;
+      --bg3: #1a1a1a;
+      --border: #2a2a2a;
+      --border2: #333;
+      --text: #e8e4dc;
+      --text2: #888;
+      --text3: #555;
+      --accent: #c8a96e;
+      --accent2: #a07840;
+      --red: #c0392b;
+      --green: #27ae60;
+      --green2: #1e8449;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .header-left h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .header-left span {
+      font-size: 0.7rem;
+      color: var(--text3);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .btn-new {
+      background: var(--accent);
+      color: #0d0d0d;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      text-transform: uppercase;
+    }
+
+    .btn-new:hover { background: var(--accent2); }
+    .btn-new:active { transform: scale(0.97); }
+
+    /* STATS BAR */
+    .stats {
+      padding: 1rem 3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 2rem;
+      font-size: 0.7rem;
+      color: var(--text3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .stats span { color: var(--accent); }
+
+    /* GRID */
+    main {
+      padding: 2.5rem 3rem;
+    }
+
+    #library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* CARD */
+    .book-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+      transition: border-color 0.2s, transform 0.2s;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .book-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .card-id {
+      font-size: 0.65rem;
+      color: var(--text3);
+      letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      line-height: 1.3;
+    }
+
+    .card-author {
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      letter-spacing: 0.05em;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-meta-item {
+      font-size: 0.7rem;
+      color: var(--text2);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .card-meta-item .val { color: var(--text); }
+
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1rem 0;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-read {
+      flex: 1;
+      padding: 0.45rem 0;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: 1px solid;
+      transition: all 0.2s;
+    }
+
+    .btn-read.read {
+      background: transparent;
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .btn-read.read:hover {
+      background: var(--green2);
+      color: var(--text);
+      border-color: var(--green2);
+    }
+
+    .btn-read.unread {
+      background: transparent;
+      border-color: var(--text3);
+      color: var(--text3);
+    }
+
+    .btn-read.unread:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .btn-remove {
+      padding: 0.45rem 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      background: transparent;
+      border: 1px solid var(--text3);
+      color: var(--text3);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-remove:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* EMPTY STATE */
+    .empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 5rem 0;
+      color: var(--text3);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+
+    .empty p:first-child {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--border2);
+      margin-bottom: 0.5rem;
+    }
+
+    /* DIALOG */
+    dialog {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 0;
+      width: min(480px, 90vw);
+      font-family: 'DM Mono', monospace;
+    }
+
+    dialog::backdrop {
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+    }
+
+    .dialog-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dialog-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .dialog-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .dialog-close:hover { color: var(--text); }
+
+    .dialog-body {
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .field label {
+      font-size: 0.65rem;
+      color: var(--text3);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .field input[type="text"],
+    .field input[type="number"] {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.8rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field input:focus { border-color: var(--accent); }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .read-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      cursor: pointer;
+    }
+
+    .read-toggle input { display: none; }
+
+    .toggle-track {
+      width: 36px;
+      height: 20px;
+      background: var(--border2);
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: var(--text2);
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .read-toggle input:checked + .toggle-track {
+      background: var(--green2);
+    }
+
+    .read-toggle input:checked + .toggle-track::after {
+      transform: translateX(16px);
+      background: var(--text);
+    }
+
+    .toggle-label {
+      font-size: 0.75rem;
+      color: var(--text2);
+    }
+
+    .dialog-footer {
+      padding: 1.2rem 2rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.8rem;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      padding: 0.55rem 1.2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+
+    .btn-cancel:hover { border-color: var(--text2); color: var(--text); }
+
+    .btn-submit {
+      background: var(--accent);
+      border: none;
+      color: #0d0d0d;
+      padding: 0.55rem 1.4rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .btn-submit:hover { background: var(--accent2); }
+
+    @media (max-width: 600px) {
+      header { padding: 1.2rem 1.5rem; }
+      main { padding: 1.5rem; }
+      .stats { padding: 0.8rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>My Library</h1>
+    <span>Personal collection</span>
+  </div>
+  <button class="btn-new" id="btn-open-dialog">+ Add Book</button>
+</header>
+
+<div class="stats">
+  <div>Total: <span id="stat-total">0</span></div>
+  <div>Read: <span id="stat-read">0</span></div>
+  <div>Unread: <span id="stat-unread">0</span></div>
+</div>
+
+<main>
+  <div id="library-grid"></div>
+</main>
+
+<dialog id="book-dialog">
+  <div class="dialog-header">
+    <h2>New Book</h2>
+    <button class="dialog-close" id="btn-close-dialog">✕</button>
+  </div>
+  <form id="book-form" method="dialog">
+    <div class="dialog-body">
+      <div class="field">
+        <label>Title</label>
+        <input type="text" id="input-title" placeholder="Book title" required />
+      </div>
+      <div class="field">
+        <label>Author</label>
+        <input type="text" id="input-author" placeholder="Author name" required />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Pages</label>
+          <input type="number" id="input-pages" placeholder="0" min="1" required />
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <input type="number" id="input-age" placeholder="1984" min="1" required />
+        </div>
+      </div>
+      <label class="read-toggle">
+        <input type="checkbox" id="input-read" />
+        <div class="toggle-track"></div>
+        <span class="toggle-label">Already read</span>
+      </label>
+    </div>
+    <div class="dialog-footer">
+      <button type="button" class="btn-cancel" id="btn-cancel">Cancel</button>
+      <button type="submit" class="btn-submit">Add to Library</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const myLibrary = [];
+  let nextID = 1;
+
+  function Book(author, title, pages, age, read = false) {
+    this.author = author;
+    this.title = title;
+    this.pages = pages;
+    this.age = age;
+    this.read = read;
+    this.ID = nextID++;
+    this.date = new Date().toLocaleDateString('pt-BR');
+  }
+
+  Book.prototype.toggleRead = function() {
+    this.read = !this.read;
+  };
+
+  function addBookToLibrary(author, title, pages, age, read) {
+    const book = new Book(author, title, pages, age, read);
+    myLibrary.push(book);
+    renderLibrary();
+  }
+
+  function removeBook(id) {
+    const index = myLibrary.findIndex(b => b.ID === id);
+    if (index !== -1) {
+      myLibrary.splice(index, 1);
+      renderLibrary();
+    }
+  }
+
+  function toggleRead(id) {
+    const book = myLibrary.find(b => b.ID === id);
+    if (book) {
+      book.toggleRead();
+      renderLibrary();
+    }
+  }
+
+  function updateStats() {
+    const total = myLibrary.length;
+    const read = myLibrary.filter(b => b.read).length;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-read').textContent = read;
+    document.getElementById('stat-unread').textContent = total - read;
+  }
+
+  function renderLibrary() {
+    const grid = document.getElementById('library-grid');
+    grid.innerHTML = '';
+    updateStats();
+
+    if (myLibrary.length === 0) {
+      grid.innerHTML = `<div class="empty"><p>∅</p><p>Your library is empty</p></div>`;
+      return;
+    }
+
+    myLibrary.forEach(book => {
+      const card = document.createElement('div');
+      card.classList.add('book-card');
+      card.dataset.id = book.ID;
+      card.innerHTML = `
+        <div class="card-id">#${String(book.ID).padStart(4,'0')} · added ${book.date}</div>
+        <div class="card-title">${book.title}</div>
+        <div class="card-author">${book.author}</div>
+        <div class="card-meta">
+          <div class="card-meta-item"><span>Pages</span><span class="val">${book.pages}</span></div>
+          <div class="card-meta-item"><span>Year</span><span class="val">${book.age}</span></div>
+        </div>
+        <div class="card-divider"></div>
+        <div class="card-actions">
+          <button class="btn-read ${book.read ? 'read' : 'unread'}" data-id="${book.ID}">
+            ${book.read ? '✓ Read' : '○ Unread'}
+          </button>
+          <button class="btn-remove" data-id="${book.ID}">Remove</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    document.querySelectorAll('.btn-read').forEach(btn => {
+      btn.addEventListener('click', () => toggleRead(Number(btn.dataset.id)));
+    });
+
+    document.querySelectorAll('.btn-remove').forEach(btn => {
+      btn.addEventListener('click', () => removeBook(Number(btn.dataset.id)));
+    });
+  }
+
+  // Dialog
+  const dialog = document.getElementById('book-dialog');
+  const form = document.getElementById('book-form');
+
+  document.getElementById('btn-open-dialog').addEventListener('click', () => dialog.showModal());
+  document.getElementById('btn-close-dialog').addEventListener('click', () => dialog.close());
+  document.getElementById('btn-cancel').addEventListener('click', () => dialog.close());
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('input-title').value.trim();
+    const author = document.getElementById('input-author').value.trim();
+    const pages = parseInt(document.getElementById('input-pages').value);
+    const age = parseInt(document.getElementById('input-age').value);
+    const read = document.getElementById('input-read').checked;
+    if (!title || !author || !pages || !age) return;
+    addBookToLibrary(author, title, pages, age, read);
+    form.reset();
+    dialog.close();
+  });
+
+  // Seed
+  addBookToLibrary('Frank Herbert', 'Duna', 712, 1965, true);
+  addBookToLibrary('Frank Herbert', 'Duna Messias', 419, 1969, false);
+  addBookToLibrary('Frank Herbert', 'Filhos de Duna', 819, 1976, false);
+  addBookToLibrary('George Orwell', '1984', 328, 1949, true);
+  addBookToLibrary('George Orwell', 'A Revolução dos Bichos', 152, 1945, true);
+  addBookToLibrary('J.R.R. Tolkien', 'O Hobbit', 310, 1937, true);
+  addBookToLibrary('J.R.R. Tolkien', 'O Senhor dos Anéis', 1178, 1954, false);
+  addBookToLibrary('Isaac Asimov', 'Fundação', 255, 1951, false);
+  addBookToLibrary('Isaac Asimov', 'Eu, Robô', 253, 1950, true);
+  addBookToLibrary('Aldous Huxley', 'Admirável Mundo Novo', 311, 1932, false);
+  addBookToLibrary('Philip K. Dick', 'O Homem do Castelo Alto', 249, 1962, true);
+  addBookToLibrary('Arthur C. Clarke', '2001: Uma Odisseia no Espaço', 297, 1968, false);
+</script>
+</body>
+</html>
